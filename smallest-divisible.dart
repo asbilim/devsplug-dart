@@ -1,6 +1,3 @@
-import "dart:math";
-import "dart:io";
-
 int lowestCommonMultiple(int a, int b) {
   return (a * b) ~/ a.gcd(b);
 }
