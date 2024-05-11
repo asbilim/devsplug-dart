@@ -14,7 +14,13 @@ class Sorter {
     this.arraySize = userArray!.length;
   }
 
-  void swap(int index_1, index_2) {
+  void regenerate() {
+    for (int i = 0; i < size!; i++) {
+      this.userArray![i] = Random().nextInt(100) + 1;
+    }
+  }
+
+  void swap(List<int> array, int index_1, index_2) {
     int temp = this.userArray![index_1];
     this.userArray![index_1] = this.userArray![index_2];
     this.userArray![index_2] = temp;
@@ -24,6 +30,7 @@ class Sorter {
     for (int i = 0; i < this.arraySize!; i++) {
       stdout.write("${this.userArray![i]} ");
     }
+    print("\n");
   }
 
   void showArraySize() {
@@ -36,39 +43,104 @@ class Sorter {
 
     for (int i = lowIndex; i < highIndex; i++) {
       if (array[i] <= pivot) {
-        swap(array[tempIndex], array[highIndex]);
+        swap(array, tempIndex, i);
         tempIndex++;
       }
     }
 
-    swap(array[tempIndex], array[highIndex]);
+    swap(array, tempIndex, highIndex);
     return tempIndex;
   }
 
-  void quickSort() {
-    
+  void quickSort(int lowIndex, int highIndex) {
+    if (lowIndex < highIndex) {
+      int partitionIndex =
+          quickSortPartition(this.userArray!, lowIndex, highIndex);
+
+      quickSort(lowIndex, partitionIndex - 1);
+      quickSort(partitionIndex + 1, highIndex);
+    }
   }
 
-  void mergeSort() {}
+  void compareSorts() {
+    Stopwatch stopwatch = Stopwatch();
+    stopwatch.start();
+    this.bubbleSort();
+    stopwatch.stop();
+    int bubbleTime = stopwatch.elapsedMilliseconds;
+    stopwatch.reset();
+    this.regenerate();
 
-  void heapSort() {}
+    stopwatch.start();
+    quickSort(0, this.arraySize! - 1);
+    stopwatch.stop();
+    int quickTime = stopwatch.elapsedMilliseconds;
+
+    print("Bubble Sort Time: $bubbleTime ms");
+    print("Quick Sort Time: $quickTime ms");
+  }
 
   void bubbleSort() {
     for (int i = 0; i < this.arraySize!; i++) {
       for (int j = 0; j < this.arraySize! - i - 1; j++) {
         int next = j + 1;
         if (this.userArray![j] > this.userArray![next]) {
-          swap(j, j + 1);
+          swap(this.userArray!, j, j + 1);
         }
       }
     }
-    displayArray();
+  }
+
+  void displayMenu() {
+    print("===============================================");
+    print("||               Sorting Menu                ||");
+    print("===============================================");
+    print("|| 1. Display Current Array                  ||");
+    print("|| 2. Sort Using Bubble Sort                 ||");
+    print("|| 3. Sort Using Quick Sort                  ||");
+    print("|| 4. Regenerate Array                       ||");
+    print("|| 5. Compare Sorting Efficiency             ||");
+    print("|| 6. Exit                                   ||");
+    print("===============================================");
   }
 }
 
 void main() {
-  Sorter mysorter = new Sorter(40);
-  mysorter.displayArray();
-  print("\n");
-  mysorter.bubbleSort();
+  stdout.write("let's start by defining the array size: ");
+  int size = int.parse(stdin.readLineSync()!);
+
+  Sorter sorter = Sorter(size);
+
+  while (true) {
+    sorter.displayMenu();
+    stdout.write("Choose an option: ");
+    String? input = stdin.readLineSync();
+
+    switch (input) {
+      case "1":
+        sorter.displayArray();
+        break;
+      case "2":
+        sorter.bubbleSort();
+        sorter.displayArray();
+        break;
+      case "3":
+        sorter.quickSort(0, sorter.arraySize! - 1);
+        sorter.displayArray();
+        break;
+      case "4":
+        sorter.regenerate();
+        sorter.displayArray();
+        break;
+      case "5":
+        sorter.compareSorts();
+        break;
+      case "6":
+        print("Exiting the program...");
+        return;
+      default:
+        print("Invalid choice. Please try again.");
+        break;
+    }
+  }
 }
